@@ -713,7 +713,7 @@ def detect_virtualization() -> str:
 
 
 def check_processor() -> str:
-    """Check system processor name.
+    """Check system processor architecture name.
     Args:
     Returns:
         processor name if succeeded. Else, 'Unknown'.
@@ -725,6 +725,14 @@ def check_processor() -> str:
     except BaseException as e:
         log.debug("Tried to get processor name but hit exception: %s", e)
         print(f"{ERROR} hit exception while querying processor name")
+    if not proc_name:
+        try:
+            stdout, stderr, rc = runcmd('uname -m', ignore_exception=True)
+            if rc == 0 and stdout.strip():
+                proc_name = stdout.strip()
+                log.debug("Got proc_name from uname -m: %s", proc_name)
+        except BaseException as e:
+            log.debug("uname -m failed with exception: %s", e)
     log.debug("Got proc_name: %s", proc_name)
     if not proc_name:
         print(f"{ERROR} cannot get the processor name. The tool cannot " +
